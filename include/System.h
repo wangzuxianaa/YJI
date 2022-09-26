@@ -25,11 +25,8 @@ private:
 
     UDPServer* mpUDPServer;
 
-    StatusMonitor* mpStatusMonitor;
-
     std::thread* mptUDPServer;
 
-    std::thread* mptStatusMonitor;
 };
 
 }

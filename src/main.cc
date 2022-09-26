@@ -4,5 +4,6 @@
 
 int main(int args, char** argv)
 {
-
+    YJI::System YJISystem();
+    
 }

@@ -14,16 +14,16 @@ ${PROJECT_SOURCE_DIR}/include
 )
 
 add_library(${PROJECT_NAME} SHARED
-src/System.cpp
-src/UDPServer.cpp
-src/StatusMonitor.cpp
-src/ChassisSerialPort.cpp
+src/System.cc
+src/UDPServer.cc
+src/StatusMonitor.cc
+# src/ChassisSerialPort.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
 nlohmann_json::nlohmann_json)
 
 add_executable(main 
-src/main.cpp)
+src/main.cc)
 
 target_link_libraries(main ${PROJECT_NAME})
