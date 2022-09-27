@@ -16,8 +16,8 @@ ${PROJECT_SOURCE_DIR}/include
 add_library(${PROJECT_NAME} SHARED
 src/System.cc
 src/UDPServer.cc
-src/StatusMonitor.cc
-# src/ChassisSerialPort.cpp
+src/SystemMonitor.cc
+src/ChassisSerialPort.cc
 )
 
 target_link_libraries(${PROJECT_NAME}

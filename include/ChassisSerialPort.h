@@ -24,7 +24,6 @@ public:
 
     void InitSerialPort(const std::string& port_name, uint baud_rate);
 
-    void StartReceive();
 
     
 

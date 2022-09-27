@@ -48,6 +48,8 @@ private:
 
     boost::asio::io_context mIoContext;
 
+    // Common::UDPMessage meMessage;
+
     char mRecvBuff[1024];
 };
 }

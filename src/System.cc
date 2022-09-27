@@ -11,13 +11,15 @@ namespace YJI
     {
         std::cout << "Succeed to open setting file at:" << strSettingsFile << std::endl;
 
-        // 主线程可以用来接收配置文件的盘货请求
+        // 主线程可以用来接收盘货请求
 
         // 创建UDP接收线程，接收导航电脑的数据
         mpUDPServer = new UDPServer(9090);
 
         mptUDPServer = new thread(&YJI::UDPServer::Run,
                             mpUDPServer);
+
+        
     }
 
     void System::Shutdown()

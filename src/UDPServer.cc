@@ -7,12 +7,19 @@ namespace YJI
 {
 UDPServer::UDPServer(const int port) : mSocket(mIoContext, udp::endpoint(udp::v4(), port))
 {
+    std::cout << "Init Socket Successfully" << std::endl;
     StartRecvUDPData();
 }
 
 UDPServer::~UDPServer()
 {
-    mSocket.close();
+    if(mSocket.is_open())
+    {
+        mSocket.cancel();
+        mSocket.close();
+    }
+    mIoContext.stop();
+    mIoContext.reset();
 }
 
 void UDPServer::StartRecvUDPData()
