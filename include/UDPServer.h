@@ -5,6 +5,7 @@
 #include <boost/bind.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <mutex>
 #include "Common.h"
 
 using boost::asio::ip::udp;
@@ -13,7 +14,9 @@ using boost::asio::serial_port;
 namespace YJI
 {
 class System;
-
+class Common;
+class ChassisSerialPort;
+ 
 class UDPServer 
 {
 public:
@@ -23,7 +26,10 @@ public:
 
     void StartRecvUDPData();
 
-    void StartSendUDPData(const Common::UDPMessage& message, boost::property_tree::ptree& tree);
+    void StartSendUDPData(const std::string& message, boost::property_tree::ptree& SendTree, 
+                            boost::property_tree::ptree& RecvTree);
+
+    void SetChassisSerialPort(ChassisSerialPort* pChassisSerialPort);
 
     // 请求中止线程
     void RequestFinish();
@@ -42,13 +48,15 @@ protected:
 private:
     // UDP套接字
     udp::socket mSocket;
-    
+
     // 客户端信息
     udp::endpoint mRemoteEndPoint;
 
+    std::mutex mMutexAGVInfo;
+
     boost::asio::io_context mIoContext;
 
-    // Common::UDPMessage meMessage;
+    ChassisSerialPort* mpChassisSerialPort;
 
     char mRecvBuff[1024];
 };

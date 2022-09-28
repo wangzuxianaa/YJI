@@ -44,6 +44,11 @@ void ChassisSerialPort::InitSerialPort(const std::string& port_name, uint baud_r
 	mSerialPort.set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
 }
 
+void ChassisSerialPort::SetUDPServer(UDPServer* pUDPServer)
+{
+    mpUDPServer = pUDPServer;
+}
+
 void ChassisSerialPort::Run()
 {
     try {

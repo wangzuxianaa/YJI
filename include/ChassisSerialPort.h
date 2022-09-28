@@ -18,6 +18,7 @@ namespace YJI
 {
 
 class System;
+class UDPServer;
 
 class ChassisSerialPort
 {
@@ -28,12 +29,17 @@ public:
 
     void InitSerialPort(const std::string& port_name, uint baud_rate);
 
+    // 设置句柄
+    void SetUDPServer(UDPServer* pUDPServer);
+
     void Run();
 
 private:
     boost::asio::io_context mIoContext;
 
     boost::asio::serial_port mSerialPort;
+
+    UDPServer* mpUDPServer;
 
     // //打开20ms数据上传结构体
     // union OPen20MsData

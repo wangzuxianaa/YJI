@@ -18,6 +18,7 @@ src/System.cc
 src/UDPServer.cc
 src/SystemMonitor.cc
 src/ChassisSerialPort.cc
+# src/common.cc
 )
 
 target_link_libraries(${PROJECT_NAME}

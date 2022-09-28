@@ -13,6 +13,7 @@ namespace YJI
 
         // 主线程可以用来接收盘货请求
 
+
         // 创建UDP接收线程，接收导航电脑的数据
         mpUDPServer = new UDPServer(9090);
 
@@ -27,10 +28,16 @@ namespace YJI
         mptChassisSerialPort = new thread(&YJI::ChassisSerialPort::Run,
                                             mpChassisSerialPort);
 
+        // 系统检测电池状态信息
         mpSystemMonitor = new SystemMonitor("/dev", 9600);
 
         mptSystemMonitor = new thread(&YJI::SystemMonitor::Run,
                                         mpSystemMonitor);
+
+        // 设置进程间的指针
+        mpChassisSerialPort->SetUDPServer(mpUDPServer);
+
+        mpUDPServer->SetChassisSerialPort(mpChassisSerialPort);
     }
 
     void System::Shutdown()

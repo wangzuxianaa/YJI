@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+
 namespace YJI
 {
 UDPServer::UDPServer(const int port) : mSocket(mIoContext, udp::endpoint(udp::v4(), port))
@@ -40,69 +41,104 @@ void UDPServer::StartRecvUDPData()
                 for(auto it = RecvPtree.begin(); it != RecvPtree.end(); it++)
                 {
                     std::cout << it->first << std::endl;
-                    StartSendUDPData(ResolveMessage(msg), SendPtree);
+                    if(it->first == "Final_Pose")
+                    {
+                        auto pt = RecvPtree.get_child("Final_Pose");
+                        for(auto it2 = pt.begin(); it2 != pt.end(); it2++)
+                        {
+                        }
+                    }
+                    else if(it->first == "Linear")
+                    {
+                        
+                    }
+                    else if(it->first == "Angular")
+                    {
+                        
+                    }
+                    StartSendUDPData(it->first, SendPtree, RecvPtree);
                 }
             } 
         });
 }
 
-void UDPServer::StartSendUDPData(const Common::UDPMessage& message, boost::property_tree::ptree& tree)
+void UDPServer::StartSendUDPData(const std::string& message, boost::property_tree::ptree& SendTree, boost::property_tree::ptree& RecvTree)
 {
     // 根据接收类型发数据
-    switch (message)
+    switch (ResolveMessage(message))
     {
     case Common::UDPMessage::Linear:
         // 线速度
+        AGV_Vel.Linear = RecvTree.get_value<float>();
         break;
     case Common::UDPMessage::Angular:
         // 角速度
+        AGV_Vel.Angular = RecvTree.get_value<float>();
         break;
     case Common::UDPMessage::Charger_Switch:
         // 充电开关
+        
         break;
     case Common::UDPMessage::Final_Pose:
-        // 小车定位位置
+        // 小车定位位置       
         break;
     case Common::UDPMessage::Power_State:
         // 电源开关
-        tree.put("Power_State", true);
+        SendTree.put("Power_State", true);
         break;
     case Common::UDPMessage::Button_Stop:
         // 急停按钮
-        tree.put("Button_Stop", false);
+        SendTree.put("Button_Stop", false);
         break;
     case Common::UDPMessage::Charge_State:
         // 充电状态
-        tree.put("Charge_State", false);
+        SendTree.put("Charge_State", false);
         break;
     case Common::UDPMessage::Motor_Lock_State:
         // 电机
-        tree.put("Motor_Lock_State", false);
+        SendTree.put("Motor_Lock_State", false);
         break;
     case Common::UDPMessage::Position:
         // 小车位置
+        SendTree.put("Position", AGV_Pos.AGVX);
+        SendTree.put("Position", AGV_Pos.AGVY);
         break;
     case Common::UDPMessage::Rotation:
         // 小车偏航角
+        SendTree.put("Rotation", AGV_Pos.AGVYaw);
         break;
     case Common::UDPMessage::Twist:
         // 小车线速度和角速度
-        break;
+        {
+            unique_lock<std::mutex> lock(mMutexAGVInfo);
+            SendTree.put("Twist", (float) AGV_Info.Vx / 1000.0);
+            SendTree.put("Twist", (float) AGV_Info.Vz);
+            break;
+        }
     case Common::UDPMessage::Percent:
         // 小车电量
-        tree.put("Percent", 50.0f);
+        SendTree.put("Percent", 50.0f);
         break;
     case Common::UDPMessage::Voltage:
         //  小车电压
-        break;
+        {
+            unique_lock<std::mutex> lock(mMutexAGVInfo);
+            SendTree.put("Voltage", (float)AGV_Info.Voltage / 10.0);
+            break;
+        }
     case Common::UDPMessage::Current:
         // 小车电流
-        tree.put("Current", 20.0f);
+        SendTree.put("Current", 20.0f);
         break;
     default:
         break;
     }
-    mSocket.send_to(boost::asio::buffer(PtreeToJsonString(tree)), mRemoteEndPoint);
+    mSocket.send_to(boost::asio::buffer(PtreeToJsonString(SendTree)), mRemoteEndPoint);
+}
+
+void UDPServer::SetChassisSerialPort(ChassisSerialPort* pChassisSerialPort)
+{
+    mpChassisSerialPort = pChassisSerialPort;
 }
 
 Common::UDPMessage ResolveMessage(std::string str)
