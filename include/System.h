@@ -6,6 +6,7 @@
 
 #include "SystemMonitor.h"
 #include "UDPServer.h"
+#include "ChassisSerialPort.h"
 
 using namespace std;
 
@@ -13,6 +14,8 @@ namespace YJI
 {
 
 class UDPServer;
+class SystemMonitor;
+class ChassisSerialPort;
 
 class System
 {
@@ -25,7 +28,15 @@ private:
 
     UDPServer* mpUDPServer;
 
+    SystemMonitor* mpSystemMonitor;
+
+    ChassisSerialPort* mpChassisSerialPort;
+
     std::thread* mptUDPServer;
+
+    std::thread* mptSystemMonitor;
+
+    std::thread* mptChassisSerialPort;
 
 };
 

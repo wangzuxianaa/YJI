@@ -9,7 +9,7 @@ namespace YJI
 
 class System;
 
-class StatusMonitor
+class SystemMonitor
 {
 public:
     struct RequestCmd
@@ -21,9 +21,9 @@ public:
         uint8_t FUN;
     };
 public:
-    StatusMonitor(const std::string& port_name, const int baud_rate);
+    SystemMonitor(const std::string& port_name, const int baud_rate);
 
-    ~StatusMonitor();
+    ~SystemMonitor();
 
     void InitSerialPort(const std::string& port_name, const int baud_rate);
 

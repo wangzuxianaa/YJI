@@ -17,6 +17,7 @@ UDPServer::~UDPServer()
     {
         mSocket.cancel();
         mSocket.close();
+        std::cout << "Socket is closed" << std::endl;
     }
     mIoContext.stop();
     mIoContext.reset();
@@ -47,6 +48,7 @@ void UDPServer::StartRecvUDPData()
 
 void UDPServer::StartSendUDPData(const Common::UDPMessage& message, boost::property_tree::ptree& tree)
 {
+    // 根据接收类型发数据
     switch (message)
     {
     case Common::UDPMessage::Linear:

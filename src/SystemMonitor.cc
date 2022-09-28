@@ -3,12 +3,12 @@
 
 namespace YJI
 {
-StatusMonitor::StatusMonitor(const std::string& port_name, const int baud_rate) : mSerialPort(mIoContext)
+SystemMonitor::SystemMonitor(const std::string& port_name, const int baud_rate) : mSerialPort(mIoContext)
 {
     InitSerialPort(port_name, baud_rate);
 }
 
-StatusMonitor::~StatusMonitor()
+SystemMonitor::~SystemMonitor()
 {
     if(mSerialPort.is_open())
     {
@@ -19,12 +19,12 @@ StatusMonitor::~StatusMonitor()
     mIoContext.reset();
 }
 
-void StatusMonitor::InitSerialPort(const std::string& port_name, const int baud_rate)
+void SystemMonitor::InitSerialPort(const std::string& port_name, const int baud_rate)
 {
     boost::system::error_code ec;
 
     if(mSerialPort.is_open()) {
-        std::cout << "error : serial port is opened" << std::endl;
+        std::cout << "error : BMS serial port is opened" << std::endl;
         return;
     }
 
@@ -43,7 +43,7 @@ void StatusMonitor::InitSerialPort(const std::string& port_name, const int baud_
 	mSerialPort.set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
 }
 
-void StatusMonitor::Run()
+void SystemMonitor::Run()
 {
     try {
         mIoContext.run();
