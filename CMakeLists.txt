@@ -21,8 +21,8 @@ src/ChassisSerialPort.cc
 # src/common.cc
 )
 
-target_link_libraries(${PROJECT_NAME}
-nlohmann_json::nlohmann_json)
+# target_link_libraries(${PROJECT_NAME}
+# nlohmann_json::nlohmann_json)
 
 add_executable(main 
 src/main.cc)

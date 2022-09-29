@@ -41,21 +41,21 @@ void UDPServer::StartRecvUDPData()
                 for(auto it = RecvPtree.begin(); it != RecvPtree.end(); it++)
                 {
                     std::cout << it->first << std::endl;
-                    if(it->first == "Final_Pose")
-                    {
-                        auto pt = RecvPtree.get_child("Final_Pose");
-                        for(auto it2 = pt.begin(); it2 != pt.end(); it2++)
-                        {
-                        }
-                    }
-                    else if(it->first == "Linear")
-                    {
+                    // if(it->first == "Final_Pose")
+                    // {
+                    //     auto pt = RecvPtree.get_child("Final_Pose");
+                    //     for(auto it2 = pt.begin(); it2 != pt.end(); it2++)
+                    //     {
+                    //     }
+                    // }
+                    // else if(it->first == "Linear")
+                    // {
                         
-                    }
-                    else if(it->first == "Angular")
-                    {
+                    // }
+                    // else if(it->first == "Angular")
+                    // {
                         
-                    }
+                    // }
                     StartSendUDPData(it->first, SendPtree, RecvPtree);
                 }
             } 
@@ -69,19 +69,33 @@ void UDPServer::StartSendUDPData(const std::string& message, boost::property_tre
     {
     case Common::UDPMessage::Linear:
         // 线速度
-        AGV_Vel.Linear = RecvTree.get_value<float>();
+        AGV_Vel.Linear = RecvTree.get<float>(message);
         break;
     case Common::UDPMessage::Angular:
         // 角速度
-        AGV_Vel.Angular = RecvTree.get_value<float>();
+        AGV_Vel.Angular = RecvTree.get<float>(message);
         break;
     case Common::UDPMessage::Charger_Switch:
         // 充电开关
-        
+        Charger_Switch = RecvTree.get<bool>(message);
         break;
     case Common::UDPMessage::Final_Pose:
-        // 小车定位位置       
-        break;
+        // 小车定位位置 
+        {
+            auto pt = RecvTree.get_child("Final_Pose");
+            int index = 0;
+            for(auto it = pt.begin(); it != pt.end(); it++, index++)
+            {
+                if(index == 0) {
+                    AGV_Pos.AGVX = it->second.get_value<float>();
+                } else if(index == 1) {
+                    AGV_Pos.AGVY = it->second.get_value<float>();
+                } else if(index == 2) {
+                    AGV_Pos.AGVYaw = it->second.get_value<float>();
+                }
+            }      
+            break;
+        }
     case Common::UDPMessage::Power_State:
         // 电源开关
         SendTree.put("Power_State", true);

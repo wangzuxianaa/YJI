@@ -66,6 +66,8 @@ extern Common::AGVPos AGV_Pos;
 
 extern Common::AGVVel AGV_Vel;
 
+extern bool Charger_Switch;
+
 }
 
 
