@@ -29,10 +29,10 @@ namespace YJI
                                             mpChassisSerialPort);
 
         // 系统检测电池状态信息
-        mpSystemMonitor = new SystemMonitor("/dev", 9600);
+        // mpSystemMonitor = new SystemMonitor("/dev", 9600);
 
-        mptSystemMonitor = new thread(&YJI::SystemMonitor::Run,
-                                        mpSystemMonitor);
+        // mptSystemMonitor = new thread(&YJI::SystemMonitor::Run,
+        //                                 mpSystemMonitor);
 
         // 设置进程间的指针
         mpChassisSerialPort->SetUDPServer(mpUDPServer);

@@ -49,9 +49,40 @@ void ChassisSerialPort::SetUDPServer(UDPServer* pUDPServer)
     mpUDPServer = pUDPServer;
 }
 
+void ChassisSerialPort::StartRecvChassisData()
+{
+    
+}
+
+void ChassisSerialPort::SetSpeed(float Vx, float Vz)
+{
+    // s16 TempLSpeed=0,TempRSpeed=0;
+
+    // TempLSpeed = Vx*1000 - Vz*BaseWidth/2.0;
+    // TempRSpeed = Vx*1000 + Vz*BaseWidth/2.0;
+
+    TXRobotData1.prot.Header  = HEADER;
+    TXRobotData1.prot.Len     = 16;
+    TXRobotData1.prot.Type    = 4;
+    TXRobotData1.prot.Cmd     = 0x02;
+    TXRobotData1.prot.Num     = 4;
+    TXRobotData1.prot.Mode    = 0;
+    TXRobotData1.prot.Vx      = Vx*1000;
+    TXRobotData1.prot.Vz      = Vz;
+    TXRobotData1.prot.Check   = 0;
+
+    for(int i=0;i < sizeof(TXRobotData1.data) - 2;i++)
+    {
+        TXRobotData1.prot.Check += TXRobotData1.data[i];
+    }
+    // 串口写入数据
+    // ser.write(TXRobotData1.data,sizeof(TXRobotData1.data));
+}
+
 void ChassisSerialPort::Run()
 {
     try {
+        StartRecvChassisData();
         mIoContext.run();
     } catch (const std::exception& ex){
         std::cerr << ex.what() << std::endl;

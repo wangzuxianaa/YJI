@@ -8,8 +8,14 @@ namespace YJI
 {
 UDPServer::UDPServer(const int port) : mSocket(mIoContext, udp::endpoint(udp::v4(), port))
 {
-    std::cout << "Init Socket Successfully" << std::endl;
-    StartRecvUDPData();
+    if(mSocket.is_open())
+    {
+        std::cout << "Init Socket Successfully" << std::endl;
+    }
+    else 
+    {
+        std::cerr << "Fail to Init Socket" << std::endl;
+    }
 }
 
 UDPServer::~UDPServer()
@@ -67,19 +73,19 @@ void UDPServer::StartSendUDPData(const std::string& message, boost::property_tre
     // 根据接收类型发数据
     switch (ResolveMessage(message))
     {
-    case Common::UDPMessage::Linear:
+    case UDPMessage::Linear:
         // 线速度
         AGV_Vel.Linear = RecvTree.get<float>(message);
         break;
-    case Common::UDPMessage::Angular:
+    case UDPMessage::Angular:
         // 角速度
         AGV_Vel.Angular = RecvTree.get<float>(message);
         break;
-    case Common::UDPMessage::Charger_Switch:
+    case UDPMessage::Charger_Switch:
         // 充电开关
-        Charger_Switch = RecvTree.get<bool>(message);
+        ChargerSwitch = RecvTree.get<bool>(message);
         break;
-    case Common::UDPMessage::Final_Pose:
+    case UDPMessage::Final_Pose:
         // 小车定位位置 
         {
             auto pt = RecvTree.get_child("Final_Pose");
@@ -96,32 +102,32 @@ void UDPServer::StartSendUDPData(const std::string& message, boost::property_tre
             }      
             break;
         }
-    case Common::UDPMessage::Power_State:
+    case UDPMessage::Power_State:
         // 电源开关
         SendTree.put("Power_State", true);
         break;
-    case Common::UDPMessage::Button_Stop:
+    case UDPMessage::Button_Stop:
         // 急停按钮
         SendTree.put("Button_Stop", false);
         break;
-    case Common::UDPMessage::Charge_State:
+    case UDPMessage::Charge_State:
         // 充电状态
         SendTree.put("Charge_State", false);
         break;
-    case Common::UDPMessage::Motor_Lock_State:
+    case UDPMessage::Motor_Lock_State:
         // 电机
         SendTree.put("Motor_Lock_State", false);
         break;
-    case Common::UDPMessage::Position:
+    case UDPMessage::Position:
         // 小车位置
         SendTree.put("Position", AGV_Pos.AGVX);
         SendTree.put("Position", AGV_Pos.AGVY);
         break;
-    case Common::UDPMessage::Rotation:
+    case UDPMessage::Rotation:
         // 小车偏航角
         SendTree.put("Rotation", AGV_Pos.AGVYaw);
         break;
-    case Common::UDPMessage::Twist:
+    case UDPMessage::Twist:
         // 小车线速度和角速度
         {
             unique_lock<std::mutex> lock(mMutexAGVInfo);
@@ -129,18 +135,18 @@ void UDPServer::StartSendUDPData(const std::string& message, boost::property_tre
             SendTree.put("Twist", (float) AGV_Info.Vz);
             break;
         }
-    case Common::UDPMessage::Percent:
+    case UDPMessage::Percent:
         // 小车电量
         SendTree.put("Percent", 50.0f);
         break;
-    case Common::UDPMessage::Voltage:
+    case UDPMessage::Voltage:
         //  小车电压
         {
             unique_lock<std::mutex> lock(mMutexAGVInfo);
             SendTree.put("Voltage", (float)AGV_Info.Voltage / 10.0);
             break;
         }
-    case Common::UDPMessage::Current:
+    case UDPMessage::Current:
         // 小车电流
         SendTree.put("Current", 20.0f);
         break;
@@ -155,32 +161,33 @@ void UDPServer::SetChassisSerialPort(ChassisSerialPort* pChassisSerialPort)
     mpChassisSerialPort = pChassisSerialPort;
 }
 
-Common::UDPMessage ResolveMessage(std::string str)
+UDPMessage UDPServer::ResolveMessage(std::string str)
 {
-    if(str == "Linear")           return Common::UDPMessage::Linear;
-    if(str == "Angular")          return Common::UDPMessage::Angular;
-    if(str == "Charger_Switch")   return Common::UDPMessage::Charger_Switch;
-    if(str == "Final_Pose")       return Common::UDPMessage::Final_Pose;
-    if(str == "Power_State")      return Common::UDPMessage::Power_State;
-    if(str == "Button_Stop")      return Common::UDPMessage::Button_Stop;
-    if(str == "Charge_State")     return Common::UDPMessage::Charge_State;
-    if(str == "Motor_Lock_State") return Common::UDPMessage::Motor_Lock_State;
-    if(str == "Position")         return Common::UDPMessage::Position;
-    if(str == "Rotation")         return Common::UDPMessage::Rotation;
-    if(str == "Twist")            return Common::UDPMessage::Twist;
-    if(str == "Percent")          return Common::UDPMessage::Percent;
-    if(str == "Voltage")          return Common::UDPMessage::Voltage;
-    if(str == "Current")          return Common::UDPMessage::Current;
-    return Common::UDPMessage::Invalid;
+
+    if(str == "Linear")           return UDPMessage::Linear;
+    if(str == "Angular")          return UDPMessage::Angular;
+    if(str == "Charger_Switch")   return UDPMessage::Charger_Switch;
+    if(str == "Final_Pose")       return UDPMessage::Final_Pose;
+    if(str == "Power_State")      return UDPMessage::Power_State;
+    if(str == "Button_Stop")      return UDPMessage::Button_Stop;
+    if(str == "Charge_State")     return UDPMessage::Charge_State;
+    if(str == "Motor_Lock_State") return UDPMessage::Motor_Lock_State;
+    if(str == "Position")         return UDPMessage::Position;
+    if(str == "Rotation")         return UDPMessage::Rotation;
+    if(str == "Twist")            return UDPMessage::Twist;
+    if(str == "Percent")          return UDPMessage::Percent;
+    if(str == "Voltage")          return UDPMessage::Voltage;
+    if(str == "Current")          return UDPMessage::Current;
+    return UDPMessage::Invalid;
 }
 
 void UDPServer::Run()
 {
     try {
+        StartRecvUDPData();
         mIoContext.run();
     } catch (const std::exception& ex){
         std::cerr << ex.what() << std::endl;
     }
 }
-
 }

@@ -16,6 +16,7 @@ namespace YJI
 class UDPServer;
 class SystemMonitor;
 class ChassisSerialPort;
+class Common;
 
 class System
 {

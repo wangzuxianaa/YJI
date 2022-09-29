@@ -13,8 +13,8 @@ using boost::asio::serial_port;
 
 namespace YJI
 {
-class System;
 class Common;
+class System;
 class ChassisSerialPort;
  
 class UDPServer 
@@ -37,7 +37,7 @@ public:
     void Run();
 
 protected:
-    Common::UDPMessage ResolveMessage(std::string str);
+    UDPMessage ResolveMessage(std::string str);
 
     inline std::string PtreeToJsonString(const boost::property_tree::ptree& tree) {
         std::stringstream ss;
@@ -53,6 +53,8 @@ private:
     udp::endpoint mRemoteEndPoint;
 
     std::mutex mMutexAGVInfo;
+
+    UDPMessage meMessage;
 
     boost::asio::io_context mIoContext;
 
